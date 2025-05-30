@@ -1,0 +1,30 @@
+services:
+  # Node.js API service
+  - type: web
+    name: socio-io-bolt-api
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: PYTHON_PORT
+        value: 10001
+      - key: PYTHON_SERVER_URL
+        value: https://socio-io-bolt-python.onrender.com
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        sync: false
+    
+  # Python filtration service
+  - type: web
+    name: socio-io-bolt-python
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn flask_server:app
+    envVars:
+      - key: PYTHON_PORT
+        value: 10001
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        sync: false

@@ -1,0 +1,13 @@
+python-dotenv==1.0.0
+Pillow==10.0.0
+requests==2.31.0
+matplotlib==3.7.2
+google-cloud-vision==3.4.0
+numpy==1.24.3
+cryptography==41.0.3
+google-cloud-aiplatform==1.36.0
+langchain==0.0.267
+flask==2.3.3
+flask-cors==4.0.0
+gunicorn==21.2.0
+python-multipart==0.0.6

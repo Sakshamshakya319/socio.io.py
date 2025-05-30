@@ -1,14 +1,11 @@
 {
-  "name": "content-filter-extension",
+  "name": "socio-io-bolt-backend",
   "version": "1.0.0",
-  "description": "Content filtering extension backend using Vertex AI",    
-  "main": "extension/server.js",
+  "description": "Content filtering backend using Vertex AI",    
+  "main": "server.js",
   "scripts": {
-    "start": "node backend/start.js",
-    "start:node": "node backend/server.js",
-    "start:python": "cd backend && python flask_server.py",
-    "build": "node backend/build.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node start.js"
   },
   "dependencies": {
     "@google-cloud/aiplatform": "^3.35.0",
@@ -26,7 +23,7 @@
     "uuid": "^9.0.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "private": true
 }

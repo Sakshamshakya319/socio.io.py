@@ -17,7 +17,7 @@ function loadConfig() {
     const storedConfig = result.config || {};
     
     // Pre-fill API URL from config
-    document.getElementById('apiUrl').value = config.apiUrl || 'https://socio-io-iumw.onrender.com';
+    document.getElementById('apiUrl').value = config.apiUrl || 'https://socio-io-py.onrender.com';
     
     // Update connection status
     if (storedConfig.isConfigured) {
@@ -30,7 +30,7 @@ function loadConfig() {
 
 // Test connection to the backend API
 function testConnection() {
-  const apiUrl = document.getElementById('apiUrl').value.trim() || 'https://socio-io-iumw.onrender.com';
+  const apiUrl = document.getElementById('apiUrl').value.trim() || 'https://socio-io-py.onrender.com';
   
   // Show connecting status
   updateConnectionStatus('connecting', '<span class="spinner"></span> Testing connection...');
@@ -62,7 +62,7 @@ function testConnection() {
 
 // Save settings
 function saveSettings() {
-  const apiUrl = document.getElementById('apiUrl').value.trim() || 'https://socio-io-iumw.onrender.com';
+  const apiUrl = document.getElementById('apiUrl').value.trim() || 'https://socio-io-py.onrender.com';
   
   // Update configuration
   chrome.storage.local.get(['config'], (result) => {

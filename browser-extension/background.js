@@ -2,8 +2,8 @@
 
 // Default configuration
 const DEFAULT_CONFIG = {
-  apiUrl: 'https://socio-io-iumw.onrender.com',
-  isConfigured: false,
+  apiUrl: 'https://socio-io-py.onrender.com', // No trailing slash
+  isConfigured: true, // Set to true by default
   enabled: true,
   filterText: true,
   filterImages: true,

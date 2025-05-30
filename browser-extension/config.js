@@ -1,7 +1,7 @@
 // Extension configuration
 const config = {
   // Backend API URL (deployed on Render)
-  apiUrl: 'https://socio-io-bolt.onrender.com',
+  apiUrl: 'https://socio-io-py.onrender.com', // No trailing slash
   
   // Version
   version: '1.0.0',
@@ -10,7 +10,8 @@ const config = {
   defaults: {
     enabled: true,
     filterText: true,
-    filterImages: true
+    filterImages: true,
+    isConfigured: true // Set to true by default
   }
 };
 

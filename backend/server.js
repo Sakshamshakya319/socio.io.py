@@ -13,6 +13,10 @@ const app = require('./app');
 // Set up port from environment or default
 const PORT = process.env.PORT || 3000;
 
+// Set Python server URL from environment or use default
+// In production, this should be the URL of the Python service on Render
+process.env.PYTHON_SERVER_URL = process.env.PYTHON_SERVER_URL || 'http://localhost:5000';
+
 // Create Express server
 const server = express();
 

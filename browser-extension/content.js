@@ -354,31 +354,73 @@ function checkImageWithBackend(img) {
     // Show loading indicator
     const loadingIndicator = createLoadingIndicator(img);
     
-    // For demo purposes, we'll simulate a successful API response
-    // In a real implementation, this would be an actual API call
-    setTimeout(() => {
-      // Remove loading indicator
-      if (loadingIndicator && loadingIndicator.parentNode) {
-        loadingIndicator.parentNode.removeChild(loadingIndicator);
-      }
-      
-      // Simulate filtering based on image dimensions
-      // This is just for demonstration - real implementation would use actual API
-      const shouldFilter = img.width > 200 && img.height > 200;
-      
-      if (shouldFilter) {
-        // Apply filter to the image
-        applyImageFilter(img, { 
-          shouldFilter: true, 
-          confidence: 0.85,
-          method: 'demo-mode'
+    // Convert image to base64 for sending to API
+    getBase64FromImageUrl(img.src)
+      .then(base64Data => {
+        // Make actual API call to the backend
+        return fetch(`${config.apiUrl}/filter/image`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ image_data: base64Data })
         });
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(result => {
+        // Remove loading indicator
+        if (loadingIndicator && loadingIndicator.parentNode) {
+          loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
         
-        // Report filtered content for stats
-        const originalSrc = img.src;
-        reportFilteredContent('image', originalSrc, 'filtered-image');
-      }
-    }, 500);
+        // Check if the image should be filtered based on API response
+        const shouldFilter = result.unsafe_content && 
+                            (result.unsafe_content.adult > 0.7 || 
+                             result.unsafe_content.violence > 0.7 || 
+                             result.unsafe_content.racy > 0.8);
+        
+        if (shouldFilter) {
+          // Apply filter to the image
+          applyImageFilter(img, { 
+            shouldFilter: true, 
+            confidence: Math.max(
+              result.unsafe_content.adult || 0,
+              result.unsafe_content.violence || 0,
+              result.unsafe_content.racy || 0
+            ),
+            method: 'api'
+          });
+          
+          // Report filtered content for stats
+          const originalSrc = img.src;
+          reportFilteredContent('image', originalSrc, 'filtered-image');
+        }
+      })
+      .catch(error => {
+        console.error('Error filtering image:', error);
+        // Remove loading indicator
+        if (loadingIndicator && loadingIndicator.parentNode) {
+          loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
+        
+        // Fallback to local filtering
+        if (shouldFilterImageLocally(img)) {
+          applyImageFilter(img, { 
+            shouldFilter: true, 
+            confidence: 0.8,
+            method: 'local-fallback'
+          });
+          
+          // Report filtered content for stats
+          const originalSrc = img.src;
+          reportFilteredContent('image', originalSrc, 'filtered-image-local');
+        }
+      });
   } catch (error) {
     console.error('Error processing image for filtering:', error);
     
@@ -395,6 +437,47 @@ function checkImageWithBackend(img) {
       reportFilteredContent('image', originalSrc, 'filtered-image-local');
     }
   }
+}
+
+// Convert image URL to base64
+function getBase64FromImageUrl(url) {
+  return new Promise((resolve, reject) => {
+    // Skip data URLs
+    if (url.startsWith('data:')) {
+      resolve(url.split(',')[1]);
+      return;
+    }
+    
+    // Create a canvas element
+    const img = new Image();
+    img.crossOrigin = 'Anonymous'; // Try to avoid CORS issues
+    
+    img.onload = function() {
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = this.width;
+      canvas.height = this.height;
+      
+      // Draw image to canvas
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(this, 0, 0);
+      
+      // Get base64 data
+      try {
+        const dataURL = canvas.toDataURL('image/jpeg');
+        resolve(dataURL.split(',')[1]); // Remove the data:image/jpeg;base64, part
+      } catch (e) {
+        // If we can't get the data (e.g., CORS issues), reject
+        reject(e);
+      }
+    };
+    
+    img.onerror = function() {
+      reject(new Error('Could not load image'));
+    };
+    
+    img.src = url;
+  });
 }
 
 // Create a loading indicator for image processing
